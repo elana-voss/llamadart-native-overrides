@@ -7,6 +7,8 @@ This document captures how the bundle hosted in each release was produced, so a 
 1. `ggml-vulkan.dll` is rebuilt from source with two GLSL extension probes commented out (see `patches/disable-coopmat.patch`). The probes call `vkGetPhysicalDeviceCooperativeMatrixProperties*`, which crashes inside the affected drivers — disabling them at compile time removes the calls entirely.
 2. The bundle is slimmed to `cpu + vulkan` only (CUDA / BLAS DLLs dropped).
 
+The rebuild **must** use `-DGGML_BACKEND_DL=ON` (the upstream bundle is built that way), together with `-DGGML_NATIVE=OFF` (CMake rejects `GGML_BACKEND_DL` while `GGML_NATIVE` is on; we only build the Vulkan target so the host-CPU tuning that `GGML_NATIVE` controls is irrelevant here). It makes each backend DLL export the generic `ggml_backend_init` / `ggml_backend_score` entry points that ggml's runtime loader (`ggml_backend_load_all_from_path`) requires. A rebuild without it produces a `ggml-vulkan.dll` exporting only the `ggml_backend_vk_*` API; the loader then can't register it and logs `failed to find ggml_backend_init in ggml-vulkan.dll`, so Vulkan never loads and offload silently falls back to CPU. The build script verifies the exports and fails if they're absent.
+
 The non-windows-x64 bundles are not touched; cardwave's llamadart fork redirects only `windows-x64` here.
 
 ## Build environment (Windows host, one-time setup)
@@ -31,7 +33,8 @@ cd "C:\tmp\llamacpp_$TAG"
 git apply <path-to-overrides-repo>\patches\disable-coopmat.patch
 
 # 4. Build (this is the script committed below). Runs vcvars64.bat, configures
-#    CMake with GGML_VULKAN=ON, builds the ggml-vulkan target only.
+#    CMake with GGML_VULKAN=ON and GGML_BACKEND_DL=ON, builds the ggml-vulkan
+#    target only, then verifies the DLL exports ggml_backend_init/score.
 cmd /c <path-to-overrides-repo>\scripts\build_ggml_vulkan.bat
 
 # 5. Verify the patched DLL exists.
