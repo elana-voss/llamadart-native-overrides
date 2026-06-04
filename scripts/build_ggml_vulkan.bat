@@ -10,7 +10,7 @@ setlocal
 
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" || exit /b 1
 
-set SRC=C:\tmp\llamacpp_b9016
+set SRC=C:\tmp\llamacpp_b9371
 if not "%~1"=="" set SRC=%~1
 
 cd /d "%SRC%" || exit /b 1

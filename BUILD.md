@@ -22,7 +22,7 @@ The non-windows-x64 bundles are not touched; cardwave's llamadart fork redirects
 
 ```powershell
 # 1. Pick the target llama.cpp build tag (must match the version llamadart uses).
-$TAG = 'b9016'
+$TAG = 'b9371'
 
 # 2. Clone llama.cpp at that tag.
 cd C:\tmp

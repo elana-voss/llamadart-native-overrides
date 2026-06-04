@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/CMakeLists.txt b/ggml/src/ggml-vulkan/CMakeLists.txt
-index 715a263..5564728 100644
+index 2d9e857..63f39cf 100644
 --- a/ggml/src/ggml-vulkan/CMakeLists.txt
 +++ b/ggml/src/ggml-vulkan/CMakeLists.txt
-@@ -62,17 +62,19 @@ if (Vulkan_FOUND)
+@@ -67,23 +67,27 @@ if (Vulkan_FOUND)
      set(VULKAN_SHADER_GEN_CMAKE_ARGS "")
  
      # Test all shader extensions
@@ -17,8 +17,16 @@ index 715a263..5564728 100644
 -        "${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders/feature-tests/coopmat2.comp"
 -        "GGML_VULKAN_COOPMAT2_GLSLC_SUPPORT"
 -    )
-+    # CARDWAVE: COOPMAT tests skipped — vkGetPhysicalDeviceCooperativeMatrixProperties
-+    # crashes inside NVIDIA Blackwell + AMD AMDVLK integrated-GPU drivers.
+-
+-    test_shader_extension_support(
+-        "GL_NV_cooperative_matrix_decode_vector"
+-        "${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders/feature-tests/coopmat2_decode_vector.comp"
+-        "GGML_VULKAN_COOPMAT2_DECODE_VECTOR_GLSLC_SUPPORT"
+-    )
++    # CARDWAVE: cooperative-matrix probes skipped. The resulting code paths call
++    # vkGetPhysicalDeviceCooperativeMatrixProperties*, which crashes inside NVIDIA
++    # Blackwell + AMD AMDVLK integrated-GPU drivers. Leaving these *_GLSLC_SUPPORT
++    # variables undefined compiles the coopmat paths out entirely.
 +    # test_shader_extension_support(
 +    #     "GL_KHR_cooperative_matrix"
 +    #     "${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders/feature-tests/coopmat.comp"
@@ -29,6 +37,12 @@ index 715a263..5564728 100644
 +    #     "GL_NV_cooperative_matrix2"
 +    #     "${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders/feature-tests/coopmat2.comp"
 +    #     "GGML_VULKAN_COOPMAT2_GLSLC_SUPPORT"
++    # )
++    #
++    # test_shader_extension_support(
++    #     "GL_NV_cooperative_matrix_decode_vector"
++    #     "${CMAKE_CURRENT_SOURCE_DIR}/vulkan-shaders/feature-tests/coopmat2_decode_vector.comp"
++    #     "GGML_VULKAN_COOPMAT2_DECODE_VECTOR_GLSLC_SUPPORT"
 +    # )
  
      test_shader_extension_support(
